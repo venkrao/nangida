@@ -5,8 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from graphene_django.utils.testing import GraphQLTestCase
 from graphene_file_upload.django.testing import  GraphQLFileUploadTestCase
 from rest_framework import status
-
-from graph.schema import schema
+from api.trees.schema import schema
 
 
 class GraphTests(GraphQLFileUploadTestCase, GraphQLTestCase):

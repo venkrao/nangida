@@ -2,14 +2,10 @@ import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_file_upload.scalars import Upload
-from graphql_jwt.decorators import login_required
-from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_django.filter import DjangoFilterConnectionField
-
+import graphql_jwt
 
 from api.trees.models import *
-
-import graphql_jwt
 
 
 class TreeType(DjangoObjectType):
@@ -74,25 +70,12 @@ class UpdateTreePhoto(graphene.Mutation):
         return UpdateTreePhoto(tree_photo)
 
 
-class MyUpload(graphene.Mutation):
-    class Arguments:
-        file_in = Upload()
-
-    ok = graphene.Boolean()
-
-    def mutate(self, info, file_in):
-        for line in file_in:
-            print(line)
-        return MyUpload(ok=True)
-
-
 class Mutation(graphene.ObjectType):
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     new_tree = NewTreeMutation.Field()
     update_photo = UpdateTreePhoto.Field()
-    my_upload = MyUpload.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

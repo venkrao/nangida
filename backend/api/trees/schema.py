@@ -6,6 +6,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 import graphql_jwt
 
 from api.trees.models import *
+from graphql_jwt.decorators import login_required
 
 
 class TreeType(DjangoObjectType):
@@ -39,18 +40,34 @@ class Query(graphene.ObjectType):
 
 class NewTreeMutation(graphene.Mutation):
     class Arguments:
-        latitude = graphene.Float()
-        longitude = graphene.Float()
+        latitude = graphene.Float(required=True)
+        longitude = graphene.Float(required=True)
 
     tree = graphene.Field(TreeType)
 
     @classmethod
+    @login_required
     def mutate(cls, root, info, latitude, longitude):
         user = User.objects.get(username=info.context.user)
         tree = Tree(latitude=latitude, longitude=longitude, owner=user)
         tree.save()
 
         return NewTreeMutation(tree=tree)
+
+
+class DeleteTreeMutation(graphene.Mutation):
+    class Arguments:
+        tree_id = graphene.UUID()
+
+    delete_ok = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    def mutate(cls, root, info, tree_id):
+        user = User.objects.get(username=info.context.user)
+        tree = Tree.objects.get(tree_id=tree_id, owner=user)
+        delete_ok = tree.delete()
+        return DeleteTreeMutation(delete_ok=delete_ok)
 
 
 class UpdateTreePhoto(graphene.Mutation):
@@ -61,11 +78,13 @@ class UpdateTreePhoto(graphene.Mutation):
     photo = graphene.Field(TreePhotoType)
 
     @classmethod
+    @login_required
     def mutate(cls, root, info, photo, tree_id):
+        print(photo)
+        print(tree_id)
         tree = Tree.objects.get(tree_id=tree_id)
         tree_photo = TreePhoto(tree_id=tree, photo=photo)
         tree_photo.save()
-        print(tree_photo)
 
         return UpdateTreePhoto(tree_photo)
 
@@ -76,6 +95,7 @@ class Mutation(graphene.ObjectType):
     refresh_token = graphql_jwt.Refresh.Field()
     new_tree = NewTreeMutation.Field()
     update_photo = UpdateTreePhoto.Field()
+    delete_tree = DeleteTreeMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

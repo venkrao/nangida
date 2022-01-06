@@ -13,13 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
 
 from graphene_file_upload.django import FileUploadGraphQLView
+from .settings import MEDIA_URL, MEDIA_ROOT
 
 urlpatterns = [
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
     path('admin/', admin.site.urls),
-]
+] + static(MEDIA_URL + "tree-photos/", document_root=MEDIA_ROOT)

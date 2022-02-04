@@ -38,13 +38,13 @@ const TreeListScreen = ({navigation}) => {
       return <View><Text>Loading..</Text></View>
     }
     if (error) {      
-      return <View><Text>{error.message}</Text></View>
+      return <View><Text>{JSON.stringify(error)}</Text></View>
     }
 
     return (
       <ScrollView>        
         {data && data.allTrees && data.allTrees.map((tree) => (
-          <View>
+          <View key={tree.treeId} >
             <Text 
                 style={styles.button}
                 onPress={() => {
@@ -54,7 +54,7 @@ const TreeListScreen = ({navigation}) => {
               {tree.treeId}
             </Text>
             
-            <Tree key={tree.treeId} tree={tree} latestPhotoOnly={true} />
+            <Tree tree={tree} latestPhotoOnly={true} />
             </View>
         ))}
       </ScrollView>

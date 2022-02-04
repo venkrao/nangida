@@ -46,12 +46,13 @@ const SingleTreeScreen = ({route, navigation}) => {
         }}/>
         {
           data && data.tree && [data.tree.edges[0].node].map((tree) => (
-          <View>
+          
+          <View key={tree.treeId}>
             <Text>
               {tree.treeId}
             </Text>
-            <Tree key={tree.treeId} tree={tree} latestPhotoOnly={false} />
-            </View>
+            <Tree  tree={tree} latestPhotoOnly={false} />
+          </View>
         ))}
         
       </ScrollView>
